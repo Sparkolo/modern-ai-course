@@ -634,6 +634,7 @@ def readCommand( argv ):
     return args
 
 def loadAgent(pacman, nographics):
+    agent_name = pacman if isinstance(pacman, str) else pacman.__name__
     # Looks through all pythonPath Directories for the right module,
     pythonPathStr = os.path.expandvars("$PYTHONPATH")
     if pythonPathStr.find(';') == -1:
@@ -652,11 +653,11 @@ def loadAgent(pacman, nographics):
             except ImportError:
                 print ('Cannot Import ', modulename)
                 continue
-            if pacman in dir(module):
+            if agent_name in dir(module):
                 if nographics and modulename == 'keyboardAgents.py':
                     raise Exception('Using the keyboard requires graphics (not text display)')
-                return getattr(module, pacman)
-    raise Exception('The agent ' + pacman + ' is not specified in any *Agents.py.')
+                return getattr(module, agent_name)
+    raise Exception('The agent ' + agent_name + ' is not specified in any *Agents.py.')
 
 def replayGame( layout, actions, display ):
     import PacmanAgents, ghostAgents
@@ -813,7 +814,7 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
             else:
                 savedDisplay = game.run(savedDisplay)
 
-            if game.gameQuit:
+            if game.gameOver:
                 return (games, display)
             
             # Show win / loss message
